@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "backend",
+			"path": "storyServer"
+		},
+		{
+			"name": "frontend",
+			"path": "frontend"
+		}
+	],
+	"settings": {
+		"git.ignoreLimitWarning": true
+	}
+}
