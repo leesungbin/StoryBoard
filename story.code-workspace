@@ -2,7 +2,7 @@
 	"folders": [
 		{
 			"name": "backend",
-			"path": "storyServer"
+			"path": "backend"
 		},
 		{
 			"name": "frontend",

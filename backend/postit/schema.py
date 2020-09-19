@@ -1,4 +1,4 @@
-from graphene import relay, ObjectType, AbstractType, String, Boolean, ID, Field, DateTime, Int, InputObjectType
+from graphene import relay, ObjectType, AbstractType, String, Boolean, ID, Field, DateTime, Int, Float, InputObjectType
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from .models import Card
@@ -28,46 +28,14 @@ class Query(object):
 
 
 '''
-Input types
-'''
-
-
-# class NewCardInput(InputObjectType):
-#     author = String(required=True)
-
-
-# class UpdateCardInput(InputObjectType):
-#     id = ID()
-#     title = String()
-#     content = String(required=False)
-#     date = DateTime()
-#     state = String()
-#     importance = Int()
-#     color = String()
-
-
-'''
 Mutations
 '''
-
-
-class TestMutation(relay.ClientIDMutation):
-    ok = Boolean()
-
-    class Input:
-        pass
-
-    @classmethod
-    def mutate_and_get_payload(cls, root, info, **input):
-        return TestMutation(ok=True)
 
 
 class NewCard(relay.ClientIDMutation):
     ok = Boolean()
     card = relay.Node.Field(CardNode)
 
-    # class Arguments:
-    #     card_data = NewCardInput(required=True)
     class Input:
         author = String(required=True)
 
@@ -80,7 +48,7 @@ class NewCard(relay.ClientIDMutation):
             card.save()
             return NewCard(card=card, ok=True)
         except Exception as err:
-            print("NewCard err : ", err)
+            print("NewCard error : ", err)
             return NewCard(card=None, ok=False)
 
 
@@ -88,10 +56,8 @@ class UpdateCard(relay.ClientIDMutation):
     ok = Boolean()
     card = relay.Node.Field(CardNode)
 
-    # class Arguments:
-    #     cards_data = UpdateCardInput(required=True)
     class Input:
-        id = ID()
+        id = ID(required=True)
         title = String()
         content = String(required=False)
         author = String()
@@ -99,6 +65,9 @@ class UpdateCard(relay.ClientIDMutation):
         state = String()
         importance = Int()
         color = String()
+
+        x = Float()
+        y = Float()
 
     @classmethod
     def mutate(cls, root, info, input):
@@ -111,10 +80,13 @@ class UpdateCard(relay.ClientIDMutation):
             card.state = input.state
             card.importance = input.importance
             card.color = input.color
+
+            card.x = input.x
+            card.y = input.y
             card.save()
             return UpdateCard(card=card, ok=True)
         except Exception as err:
-            print("UpdateCard err : ", err)
+            print("UpdateCard error : ", err)
             return UpdateCard(card=None, ok=False)
 
 
@@ -122,7 +94,7 @@ class DeleteCard(relay.ClientIDMutation):
     ok = Boolean()
 
     class Input:
-        id = ID()
+        id = ID(required=True)
 
     @classmethod
     def mutate(cls, root, info, input):
@@ -135,7 +107,29 @@ class DeleteCard(relay.ClientIDMutation):
             return DeleteCard(ok=False)
 
 
+class ChangePosition(relay.ClientIDMutation):
+    ok = Boolean()
+
+    class Input:
+        id = ID(required=True)
+        x = Float()
+        y = Float()
+
+    @classmethod
+    def mutate(cls, root, info, input):
+        try:
+            card = Card.objects.get(pk=from_global_id(input.id)[1])
+            card.x = input.x
+            card.y = input.y
+            card.save()
+            return ChangePosition(ok=True)
+        except Exception as err:
+            print("ChangePosition error : ", err)
+            return ChangePosition(ok=False)
+
+
 class RelayMutation(AbstractType):
     new_card = NewCard.Field()
     update_card = UpdateCard.Field()
     delete_card = DeleteCard.Field()
+    change_position = ChangePosition.Field()
