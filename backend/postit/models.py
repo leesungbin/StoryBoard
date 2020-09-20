@@ -15,8 +15,8 @@ class Card(models.Model):
     color = models.CharField(max_length=20, default=colors[0])
 
     # position
-    x = models.FloatField(default=0)
-    y = models.FloatField(default=0)
+    x = models.IntegerField(default=0)
+    y = models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
