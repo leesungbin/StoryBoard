@@ -1,0 +1,83 @@
+$blue: #9FCBFF;
+$blue-selected: #4396F8;
+$green: #AEFF9F;
+$green-selected: #55BC42;
+$red: #FFB19F;
+$red-selected: #FF8569;
+$yellow: #FFE99F;
+$yellow-selected: #F8D250;
+
+.handler {
+  width: 280px;
+  height: 20px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+}
+.grab {
+  margin-left: 60px;
+  margin-right: 60px;
+  width: 120px;
+  height: 10px;
+  border-radius: 8px;
+  background-color: white;
+  opacity: 70%;
+  box-shadow: 0px 2px 20px #777777;
+}
+.sub {
+  padding: 0 20px 20px 20px;
+}
+.card {
+  position: absolute;
+  width: 300px;
+  // padding: 20px;
+  margin: 10px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0px 3px 6px #777777;
+  h1 {
+    font-size: 20px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  &.blue {
+    background-color: $blue;
+    &.selected {
+      background-color: $blue-selected;
+    }
+  }
+  &.green {
+    background-color: $green;
+    &.selected {
+      background-color: $green-selected;
+    }
+  }
+  &.red {
+    background-color: $red;
+    &.selected {
+      background-color: $red-selected;
+    }
+  }
+  &.yellow {
+    background-color: $yellow;
+    &.selected {
+      background-color: $yellow-selected;
+    }
+  }
+}
+.bot {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between; 
+  align-content: flex-end;
+  p {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    margin: 0 0 10px 0;
+  }
+}
+

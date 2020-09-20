@@ -9,9 +9,6 @@ import {
 import { GRAPHQL_ENDPOINT } from "./endpoint";
 
 const fetchQuery: FetchFunction = async (operation, variables): Promise<GraphQLResponse> => {
-  console.log('fetchQuery');
-  console.log(operation);
-  console.log(variables);
   try {
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: 'POST',

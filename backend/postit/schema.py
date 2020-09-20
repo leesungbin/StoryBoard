@@ -65,8 +65,8 @@ class UpdateCard(relay.ClientIDMutation):
         importance = Int(required=False)
         color = String(required=False)
 
-        x = Float(required=False)
-        y = Float(required=False)
+        x = Int(required=False)
+        y = Int(required=False)
 
     @classmethod
     def mutate(cls, root, info, input):

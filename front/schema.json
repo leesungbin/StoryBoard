@@ -1064,7 +1064,7 @@
               "name": "x",
               "type": {
                 "kind": "SCALAR",
-                "name": "Float",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -1074,7 +1074,7 @@
               "name": "y",
               "type": {
                 "kind": "SCALAR",
-                "name": "Float",
+                "name": "Int",
                 "ofType": null
               }
             },
@@ -1092,16 +1092,6 @@
           "interfaces": null,
           "kind": "INPUT_OBJECT",
           "name": "UpdateCardInput",
-          "possibleTypes": null
-        },
-        {
-          "description": "The `Float` scalar type represents signed double-precision fractional values as specified by [IEEE 754](http://en.wikipedia.org/wiki/IEEE_floating_point). ",
-          "enumValues": null,
-          "fields": null,
-          "inputFields": null,
-          "interfaces": null,
-          "kind": "SCALAR",
-          "name": "Float",
           "possibleTypes": null
         },
         {

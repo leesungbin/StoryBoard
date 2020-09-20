@@ -1,0 +1,36 @@
+$will: #000000;
+$now: #1B7E3D;
+$fin: #0019DD;
+$meet: #DD005E;
+$size: 60px;
+
+.main {
+  width: $size;
+  height: $size;
+  border-radius: $size/2;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0px 3px 6px #777777;
+  p {
+    width: 25px;
+    margin: 0;
+    font-size: 25px;
+    font-weight: 700;
+  }
+  &.will  {
+    background-color: $will;
+  }
+  &.now  {
+    background-color: $now;
+  }
+  &.fin  {
+    background-color: $fin;
+  }
+  &.meet  {
+    background-color: $meet;
+  }
+}

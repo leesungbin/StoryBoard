@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Card(models.Model):
-    states = ["will", "now", "fin"]
+    states = ["will", "now", "fin", "meet"]
     colors = ["blue", "yellow", "red", "green"]
     title = models.CharField(max_length=100, blank=True)
     content = models.TextField(null=True, blank=True)
