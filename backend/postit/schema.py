@@ -42,7 +42,6 @@ class NewCard(relay.ClientIDMutation):
     @classmethod
     def mutate(cls, root, info, input):
         try:
-            # print("@@", input)
             card = Card()
             card.author = input.author
             card.save()
@@ -58,31 +57,24 @@ class UpdateCard(relay.ClientIDMutation):
 
     class Input:
         id = ID(required=True)
-        title = String()
+        title = String(required=False)
         content = String(required=False)
-        author = String()
-        date = DateTime()
-        state = String()
-        importance = Int()
-        color = String()
+        author = String(required=False)
+        date = DateTime(required=False)
+        state = String(required=False)
+        importance = Int(required=False)
+        color = String(required=False)
 
-        x = Float()
-        y = Float()
+        x = Float(required=False)
+        y = Float(required=False)
 
     @classmethod
     def mutate(cls, root, info, input):
         try:
             card = Card.objects.get(pk=from_global_id(input.id)[1])
-            card.title = input.title
-            card.content = input.content
-            card.author = input.author
-            card.date = input.date
-            card.state = input.state
-            card.importance = input.importance
-            card.color = input.color
-
-            card.x = input.x
-            card.y = input.y
+            for key in input:
+                if key is not "id":
+                    setattr(card, key, getattr(input, key))
             card.save()
             return UpdateCard(card=card, ok=True)
         except Exception as err:
