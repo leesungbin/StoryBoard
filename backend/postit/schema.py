@@ -99,29 +99,7 @@ class DeleteCard(relay.ClientIDMutation):
             return DeleteCard(ok=False)
 
 
-class ChangePosition(relay.ClientIDMutation):
-    ok = Boolean()
-
-    class Input:
-        id = ID(required=True)
-        x = Float()
-        y = Float()
-
-    @classmethod
-    def mutate(cls, root, info, input):
-        try:
-            card = Card.objects.get(pk=from_global_id(input.id)[1])
-            card.x = input.x
-            card.y = input.y
-            card.save()
-            return ChangePosition(ok=True)
-        except Exception as err:
-            print("ChangePosition error : ", err)
-            return ChangePosition(ok=False)
-
-
 class RelayMutation(AbstractType):
     new_card = NewCard.Field()
     update_card = UpdateCard.Field()
     delete_card = DeleteCard.Field()
-    change_position = ChangePosition.Field()
