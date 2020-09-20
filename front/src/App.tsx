@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.scss';
 import { QueryRenderer, graphql } from "react-relay";
 import environment from './_lib/environment';
@@ -9,7 +8,6 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
         <QueryRenderer<AppQuery>
           query={graphql`
             query AppQuery {
@@ -25,7 +23,7 @@ function App() {
           `}
           variables={{}}
           environment={environment}
-          render={({ props, error }) => (<h1>hi</h1>)}
+          render={({ props, error }) => { console.log(props); return (<h1>hi</h1>) }}
         />
       </header>
     </div>
