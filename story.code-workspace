@@ -5,8 +5,8 @@
 			"path": "backend"
 		},
 		{
-			"name": "frontend",
-			"path": "frontend"
+			"name": "front",
+			"path": "front"
 		}
 	],
 	"settings": {

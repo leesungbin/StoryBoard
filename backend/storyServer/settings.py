@@ -119,7 +119,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 GRAPHENE = {
-    'SCHEMA': 'schema.schema'
+    'SCHEMA': 'schema.schema',
+    'SCHEMA_OUTPUT': '../front/schema.json',
+    'SCHEMA_INDENT': 2
 }
 
 try:
