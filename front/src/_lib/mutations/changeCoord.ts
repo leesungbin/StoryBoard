@@ -10,7 +10,7 @@ const mutation = graphql`
     ) {
     updateCard(input: {id: $id, x: $x, y: $y}) {
       ok
-      card(id: $id) {
+      card {
         x
         y
       }

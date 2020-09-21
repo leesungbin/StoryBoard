@@ -9,6 +9,7 @@ import { ImportanceIndicator } from "../ImportanceIndicator";
 import Draggable from 'react-draggable';
 import { Icon } from "./Icon";
 import { changeCoord } from "../../_lib/mutations/changeCoord";
+import { deleteCard } from "../../_lib/mutations/deleteCard";
 
 type Props = {
   relay: RelayProp,
@@ -49,7 +50,7 @@ const Card = (props: Props) => {
           <div className="bot">
             <div>
               <p>by {card.author} - {date}</p>
-              <Icon name="delete" />
+              <Icon name="delete" onClick={() => deleteCard(card.id)} />
               <Icon name="palette" />
             </div>
             {procedingState && typeof (importance) === 'number' && <ImportanceIndicator state={procedingState} value={importance}
@@ -73,7 +74,7 @@ const newLineParser = (text: string | null) => {
 export default createFragmentContainer(Card, {
   card: graphql`
     fragment Card_card on CardNode {
-        id
+      id
       title
       content
       author

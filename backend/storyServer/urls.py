@@ -16,11 +16,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from graphene_django.views import GraphQLView
+# from graphene_django_extras.views import ExtraGraphQLView
 from schema import schema
 
 from django.views.decorators.csrf import csrf_exempt
 
+from graphql.backend import GraphQLCoreBackend
+
+
+class GraphQLCustomCoreBackend(GraphQLCoreBackend):
+    def __init__(self, executor=None):
+        # type: (Optional[Any]) -> None
+        super().__init__(executor)
+        self.execute_params['allow_subscriptions'] = True
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True, schema=schema))),
+    path('graphql/', csrf_exempt(GraphQLView.as_view(graphiql=True,
+                                                     schema=schema, backend=GraphQLCustomCoreBackend()))),
 ]

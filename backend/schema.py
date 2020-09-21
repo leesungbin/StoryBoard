@@ -10,5 +10,10 @@ class Mutation(postit.schema.RelayMutation, graphene.ObjectType):
     pass
 
 
-schema = graphene.Schema(query=Query, mutation=Mutation)
+class Subscription(postit.schema.Subscription, graphene.ObjectType):
+    pass
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation,
+                         subscription=postit.schema.Subscription)
 # schema = graphene.Schema(query=Query)

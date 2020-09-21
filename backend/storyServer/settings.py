@@ -38,7 +38,10 @@ INSTALLED_APPS = [
     'postit',
     'graphene_django',
     'corsheaders',
+    'graphene_subscriptions',
+    'channels',
 ]
+ASGI_APPLICATION = "storyServer.routing.application"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

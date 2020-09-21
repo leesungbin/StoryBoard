@@ -4,10 +4,15 @@ from graphene_django.filter import DjangoFilterConnectionField
 from .models import Card
 from graphql_relay import from_global_id
 
+from graphene_subscriptions.events import CREATED
+
+from rx import Observable
+
 
 class CardNode(DjangoObjectType):
     class Meta:
         model = Card
+        interfaces = (relay.Node, )
         filter_fields = {
             'title': ['exact', 'icontains', 'istartswith'],
             'content': ['icontains'],
@@ -17,7 +22,20 @@ class CardNode(DjangoObjectType):
             'color': ['exact'],
             'date': ['gte', 'lte']
         }
-        interfaces = (relay.Node, )
+
+
+class CardConnection(relay.Connection):
+    class Meta:
+        node = CardNode
+        filter_fields = {
+            'title': ['exact', 'icontains', 'istartswith'],
+            'content': ['icontains'],
+            'author': ['exact', 'icontains'],
+            'state': ['exact'],
+            'importance': ['exact', 'gte', 'lte'],
+            'color': ['exact'],
+            'date': ['gte', 'lte']
+        }
 
 
 class Query(object):
@@ -25,6 +43,7 @@ class Query(object):
 
     card = relay.Node.Field(CardNode)
     all_cards = DjangoFilterConnectionField(CardNode)
+    # all_cards = relay.ConnectionField(CardConnection)
 
 
 '''
@@ -34,7 +53,7 @@ Mutations
 
 class NewCard(relay.ClientIDMutation):
     ok = Boolean()
-    card = relay.Node.Field(CardNode)
+    card = Field(CardNode)
 
     class Input:
         author = String(required=True)
@@ -53,7 +72,7 @@ class NewCard(relay.ClientIDMutation):
 
 class UpdateCard(relay.ClientIDMutation):
     ok = Boolean()
-    card = relay.Node.Field(CardNode)
+    card = Field(CardNode)
 
     class Input:
         id = ID(required=True)
@@ -103,3 +122,19 @@ class RelayMutation(AbstractType):
     new_card = NewCard.Field()
     update_card = UpdateCard.Field()
     delete_card = DeleteCard.Field()
+
+
+class Subscription(ObjectType):
+    hello = String()
+    card_created = Field(CardNode)
+
+    def resolve_hello(root, info):
+        return Observable.interval(3000) \
+            .map(lambda i: "hello world!")
+
+    def resolve_card_created(root, info):
+        return root.filter(
+            lambda event:
+            event.operation == CREATED and
+            isinstance(event.instance, Card)
+        ).map(lambda event: event.instance)
