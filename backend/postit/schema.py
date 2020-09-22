@@ -1,6 +1,7 @@
 from graphene import relay, ObjectType, AbstractType, String, Boolean, ID, Field, DateTime, Int, Float, InputObjectType
 from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
+from graphql_relay.connection.arrayconnection import offset_to_cursor
 from .models import Card
 from graphql_relay import from_global_id
 
@@ -51,9 +52,13 @@ Mutations
 '''
 
 
+CardEdge = CardNode._meta.connection.Edge
+
+
 class NewCard(relay.ClientIDMutation):
     ok = Boolean()
-    card = Field(CardNode)
+    card_edge = Field(CardEdge)
+    # card = Field(CardNode)
 
     class Input:
         author = String(required=True)
@@ -64,10 +69,11 @@ class NewCard(relay.ClientIDMutation):
             card = Card()
             card.author = input.author
             card.save()
-            return NewCard(card=card, ok=True)
+            edge = CardEdge(cursor=offset_to_cursor(0), node=CardNode)
+            return NewCard(card_edge=edge, ok=True)
         except Exception as err:
             print("NewCard error : ", err)
-            return NewCard(card=None, ok=False)
+            return NewCard(card_edge=None, ok=False)
 
 
 class UpdateCard(relay.ClientIDMutation):

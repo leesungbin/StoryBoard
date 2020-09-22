@@ -59,7 +59,9 @@
       "queryType": {
         "name": "Query"
       },
-      "subscriptionType": null,
+      "subscriptionType": {
+        "name": "Subscription"
+      },
       "types": [
         {
           "description": null,
@@ -831,10 +833,10 @@
               "deprecationReason": null,
               "description": null,
               "isDeprecated": false,
-              "name": "card",
+              "name": "cardEdge",
               "type": {
                 "kind": "OBJECT",
-                "name": "CardNode",
+                "name": "CardNodeEdge",
                 "ofType": null
               }
             },
@@ -1132,6 +1134,41 @@
           "interfaces": null,
           "kind": "INPUT_OBJECT",
           "name": "DeleteCardInput",
+          "possibleTypes": null
+        },
+        {
+          "description": null,
+          "enumValues": null,
+          "fields": [
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "hello",
+              "type": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            {
+              "args": [],
+              "deprecationReason": null,
+              "description": null,
+              "isDeprecated": false,
+              "name": "cardCreated",
+              "type": {
+                "kind": "OBJECT",
+                "name": "CardNode",
+                "ofType": null
+              }
+            }
+          ],
+          "inputFields": null,
+          "interfaces": [],
+          "kind": "OBJECT",
+          "name": "Subscription",
           "possibleTypes": null
         },
         {

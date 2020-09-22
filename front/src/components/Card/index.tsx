@@ -10,6 +10,9 @@ import Draggable from 'react-draggable';
 import { Icon } from "./Icon";
 import { changeCoord } from "../../_lib/mutations/changeCoord";
 import { deleteCard } from "../../_lib/mutations/deleteCard";
+import { changeColor } from "../../_lib/mutations/changeColor";
+import { changeImportance } from "../../_lib/mutations/changeImportance";
+import { changeState } from "../../_lib/mutations/changeState";
 
 type Props = {
   relay: RelayProp,
@@ -24,9 +27,10 @@ const Card = (props: Props) => {
   const [isSelected, setSelected] = useState<Boolean>(false);
   const [isOnIndicator, toggleIndicator] = useState<Boolean>(false);
   const [isOnIndicatorNumber, toggleIndicatorNumber] = useState<Boolean>(false);
+
   const cardState = ["will", "now", "fin", "meet"];
-  const [procedingState, setPs] = useState<string | undefined>(card?.state);
   const [importance, setImportance] = useState<number | undefined>(card?.importance);
+  const cardColor = ["blue", "red", "yellow", "green"];
 
   const date = moment(card?.date as string).fromNow();
 
@@ -51,13 +55,16 @@ const Card = (props: Props) => {
             <div>
               <p>by {card.author} - {date}</p>
               <Icon name="delete" onClick={() => deleteCard(card.id)} />
-              <Icon name="palette" />
+              <Icon name="palette" onClick={() => changeColor(card.id, cardColor[(cardColor.indexOf(card.color) + 1) % cardColor.length])} />
             </div>
-            {procedingState && typeof (importance) === 'number' && <ImportanceIndicator state={procedingState} value={importance}
-              onClick={() => { !isOnIndicatorNumber && setPs(cardState[(cardState.indexOf(procedingState) + 1) % cardState.length]) }}
+            {typeof (importance) === 'number' && <ImportanceIndicator state={card.state} value={importance}
+              onClick={() => {
+                !isOnIndicatorNumber &&
+                  changeState(card.id, cardState[(cardState.indexOf(card.state) + 1) % cardState.length])
+              }}
               onMouseEnter={() => { toggleIndicator(true) }}
               onMouseLeave={() => { toggleIndicator(false) }}
-              onClickNumber={() => setImportance((importance + 1) % 4)}
+              onClickNumber={() => { setImportance((importance + 1) % 4); changeImportance(card.id, (importance + 1) % 4); }}
               onMouseEnterNumber={() => { toggleIndicatorNumber(true) }}
               onMouseLeaveNumber={() => { toggleIndicatorNumber(false) }}
             />

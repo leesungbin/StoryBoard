@@ -22,7 +22,7 @@ function App() {
       <QueryRenderer<AppQuery>
         query={graphql`
             query AppQuery {
-              allCards {
+              allCards(first: 100) @connection(key: "App_allCards"){ # max GraphQL Int
                 edges {
                   cursor
                   node {
