@@ -2,7 +2,7 @@ import { commitMutation, graphql } from "react-relay";
 import environment from "../environment";
 import { newCardMutation } from "./__generated__/newCardMutation.graphql";
 
-import { ConnectionHandler } from 'relay-runtime';
+import { DeclarativeMutationConfig } from 'relay-runtime';
 
 const mutation = graphql`
   mutation newCardMutation(
@@ -11,45 +11,46 @@ const mutation = graphql`
     newCard(input: {author: $author}) {
       ok
       cardEdge {
+        cursor
         node {
           id
           author
+          color
+          state
           date
+          x
+          y
         }
       }
     }
   }
 `;
 
-// const configs: DeclarativeMutationConfig[] = [{
-//   type: "RANGE_ADD",
-//   edgeName: "edge",
-//   parentID: "client:root",
-//   connectionInfo: [{
-//     key: 'App_allCards',
-//     rangeBehavior: 'append',
-//   }]
-// }];
+const configs: DeclarativeMutationConfig[] = [{
+  type: "RANGE_ADD",
+  edgeName: "cardEdge",
+  parentID: "client:root",
+  connectionInfo: [{
+    key: 'App_allCards',
+    rangeBehavior: 'append',
+  }]
+}];
 
 
 export function newCard(author: string) {
   const variables = { author };
-  commitMutation<newCardMutation>(environment, {
-    mutation,
-    variables,
-    // configs,
-    updater: (store, data) => {
-      const root = store.getRoot();
-      const conn = ConnectionHandler.getConnection(root, "App_allCards");
-      const payload = store.getRootField("newCard");
-
-      // Get the edge of the newly created Todo record
-      const newEdge = payload.getLinkedRecord('newCard');
-      ConnectionHandler.insertEdgeAfter(conn!, newEdge!);
-    },
-    onCompleted: (res, err) => {
-      console.log(res.newCard?.ok);
-    },
-    onError: (err) => console.error(err),
-  });
+  return new Promise((resolve, reject) => {
+    commitMutation<newCardMutation>(environment, {
+      mutation,
+      variables,
+      configs,
+      onCompleted: (res, err) => {
+        resolve();
+      },
+      onError: (err) => {
+        console.error(err);
+        reject();
+      }
+    });
+  })
 }

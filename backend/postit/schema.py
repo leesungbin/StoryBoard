@@ -25,20 +25,6 @@ class CardNode(DjangoObjectType):
         }
 
 
-class CardConnection(relay.Connection):
-    class Meta:
-        node = CardNode
-        filter_fields = {
-            'title': ['exact', 'icontains', 'istartswith'],
-            'content': ['icontains'],
-            'author': ['exact', 'icontains'],
-            'state': ['exact'],
-            'importance': ['exact', 'gte', 'lte'],
-            'color': ['exact'],
-            'date': ['gte', 'lte']
-        }
-
-
 class Query(object):
     node = relay.Node.Field()
 
@@ -52,12 +38,16 @@ Mutations
 '''
 
 
-CardEdge = CardNode._meta.connection.Edge
+# CardEdge = CardNode._meta.connection.Edge
+class CardEdge(ObjectType):
+    node = Field(CardNode)
+    cursor = String()
 
 
 class NewCard(relay.ClientIDMutation):
     ok = Boolean()
     card_edge = Field(CardEdge)
+
     # card = Field(CardNode)
 
     class Input:
@@ -69,8 +59,10 @@ class NewCard(relay.ClientIDMutation):
             card = Card()
             card.author = input.author
             card.save()
-            edge = CardEdge(cursor=offset_to_cursor(0), node=CardNode)
-            return NewCard(card_edge=edge, ok=True)
+            card_edge = CardEdge(
+                cursor=offset_to_cursor(Card.objects.count()), node=card)
+
+            return NewCard(card_edge=card_edge, ok=True)
         except Exception as err:
             print("NewCard error : ", err)
             return NewCard(card_edge=None, ok=False)
