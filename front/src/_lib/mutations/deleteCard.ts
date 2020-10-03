@@ -8,13 +8,19 @@ const mutation = graphql`
     ) {
     deleteCard(input: {id: $id}) {
       ok
+      id
     }
   }
 `;
 
 const configs: DeclarativeMutationConfig[] = [{
-  type: 'NODE_DELETE',
+  type: 'RANGE_DELETE',
   deletedIDFieldName: "id",
+  parentID: "client:root",
+  connectionKeys: [{
+    key: "App_allCards",
+  }],
+  pathToConnection: ["edges", "allCards"],
 }];
 
 export function deleteCard(id: string) {
@@ -26,11 +32,11 @@ export function deleteCard(id: string) {
     optimisticUpdater: (store) => {
       store.delete(id);
     },
-    updater: (store, data) => {
-      store.delete(id);
-    },
+    // updater: (store, data) => {
+    //   store.delete(id);
+    // },
     onCompleted: (res, err) => {
-      console.log(res.deleteCard?.ok);
+      console.log(res.deleteCard);
       resolve();
     },
     onError: (err) => { console.error(err); reject() }

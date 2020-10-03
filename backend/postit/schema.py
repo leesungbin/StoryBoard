@@ -5,10 +5,6 @@ from graphql_relay.connection.arrayconnection import offset_to_cursor
 from .models import Card
 from graphql_relay import from_global_id
 
-from graphene_subscriptions.events import CREATED
-
-from rx import Observable
-
 
 class CardNode(DjangoObjectType):
     class Meta:
@@ -101,6 +97,7 @@ class UpdateCard(relay.ClientIDMutation):
 
 class DeleteCard(relay.ClientIDMutation):
     ok = Boolean()
+    id = ID()
 
     class Input:
         id = ID(required=True)
@@ -110,7 +107,7 @@ class DeleteCard(relay.ClientIDMutation):
         try:
             card = Card.objects.get(pk=from_global_id(input.id)[1])
             card.delete()
-            return DeleteCard(ok=True)
+            return DeleteCard(ok=True, id=input.id)
         except Exception as err:
             print("DeleteCard error : ", err)
             return DeleteCard(ok=False)
@@ -120,19 +117,3 @@ class RelayMutation(AbstractType):
     new_card = NewCard.Field()
     update_card = UpdateCard.Field()
     delete_card = DeleteCard.Field()
-
-
-class Subscription(ObjectType):
-    hello = String()
-    card_created = Field(CardNode)
-
-    def resolve_hello(root, info):
-        return Observable.interval(3000) \
-            .map(lambda i: "hello world!")
-
-    def resolve_card_created(root, info):
-        return root.filter(
-            lambda event:
-            event.operation == CREATED and
-            isinstance(event.instance, Card)
-        ).map(lambda event: event.instance)
