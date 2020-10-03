@@ -34,36 +34,8 @@ class Query(object):
 Subscriptions
 '''
 
+
 from channels_graphql_ws import Subscription
-class Test(Subscription):
-    """Simple GraphQL subscription."""
-
-    # Subscription payload.
-    text = String()
-
-    # class Arguments:
-    #     """That is how subscription arguments are defined."""
-    #     arg1 = String()
-    #     arg2 = String()
-
-    @staticmethod
-    def subscribe(root, info):
-        """Called when user subscribes."""
-        print("subscribed!!")
-        # Return the list of subscription group names.
-        return ['group1']
-
-    @staticmethod
-    def publish(payload, info):
-        """Called to notify the client."""
-
-        # Here `payload` contains the `payload` from the `broadcast()`
-        # invocation (see below). You can return `MySubscription.SKIP`
-        # if you wish to suppress the notification to a particular
-        # client. For example, this allows to avoid notifications for
-        # the actions made by this particular client.
-        print("publish : ", payload)
-        return Test(text='Something has happened!')
 
 class CardHasCreated(Subscription):
     sender = String()
@@ -72,13 +44,11 @@ class CardHasCreated(Subscription):
     class Arguments:
         group = String()
 
-    @staticmethod
-    def subscribe(self, info, group):
+    def subscribe(root, info, group):
         return [group]
 
-    @staticmethod
-    def publish(self, info):
-        return CardHasCreated(sender=self.sender, card=self.card)
+    def publish(payload, info, group):
+        return CardHasCreated(sender=payload["sender"], card=payload["card"])
     
     @classmethod
     def announce(cls, group, sender, card):
@@ -87,9 +57,49 @@ class CardHasCreated(Subscription):
             payload={"sender": sender, "card": card},
         )
 
+class CardHasUpdated(Subscription):
+    card = Field(CardNode)
+
+    class Arguments:
+        group = String()
+
+    def subscribe(root, info, group):
+        return [group]
+
+    def publish(payload, info, group):
+        return CardHasUpdated(card = payload["card"])
+    
+    @classmethod
+    def announce(cls, group, card):
+        cls.broadcast(
+            group=group,
+            payload={"card": card},
+        )
+
+class CardHasDeleted(Subscription):
+    id = String()
+
+    class Arguments:
+        group = String()
+
+    def subscribe(root, info, group):
+        return [group]
+
+    def publish(payload, info, group):
+        return CardHasDeleted(id = payload["id"])
+    
+    @classmethod
+    def announce(cls, group, id):
+        cls.broadcast(
+            group=group,
+            payload={"id": id},
+        )
+
 class RelaySubscription(ObjectType):
-    test = Test.Field()
+    # test = Test.Field()
     card_has_created = CardHasCreated.Field()
+    card_has_updated = CardHasUpdated.Field()
+    card_has_deleted = CardHasDeleted.Field()
 
 '''
 Mutations
@@ -157,6 +167,7 @@ class UpdateCard(relay.ClientIDMutation):
                 if key != "id":
                     setattr(card, key, getattr(input, key))
             card.save()
+            CardHasUpdated.announce("group1",card)
             return UpdateCard(card=card, ok=True)
         except Exception as err:
             print("UpdateCard error : ", err)
@@ -175,6 +186,7 @@ class DeleteCard(relay.ClientIDMutation):
         try:
             card = Card.objects.get(pk=from_global_id(input.id)[1])
             card.delete()
+            CardHasDeleted.announce("group1", input.id)
             return DeleteCard(ok=True, id=input.id)
         except Exception as err:
             print("DeleteCard error : ", err)
