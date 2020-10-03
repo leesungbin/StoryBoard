@@ -34,7 +34,7 @@ function App() {
           `}
         variables={{}}
         environment={environment}
-        render={({ props, error }) => {
+        render={({ props, error, retry }) => {
           const edges = props?.allCards?.edges;
           return edges && edges.map((edge, i) => edge && <Card card={edge.node} key={i} />)
         }}

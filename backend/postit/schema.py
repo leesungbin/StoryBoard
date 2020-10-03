@@ -3,8 +3,9 @@ from graphene_django.types import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
 from graphql_relay.connection.arrayconnection import offset_to_cursor
 from .models import Card
+# from .subscription import CardHasCreated
 from graphql_relay import from_global_id
-
+from rx import Observable
 
 class CardNode(DjangoObjectType):
     class Meta:
@@ -30,15 +31,81 @@ class Query(object):
 
 
 '''
+Subscriptions
+'''
+
+from channels_graphql_ws import Subscription
+class Test(Subscription):
+    """Simple GraphQL subscription."""
+
+    # Subscription payload.
+    text = String()
+
+    # class Arguments:
+    #     """That is how subscription arguments are defined."""
+    #     arg1 = String()
+    #     arg2 = String()
+
+    @staticmethod
+    def subscribe(root, info):
+        """Called when user subscribes."""
+        print("subscribed!!")
+        # Return the list of subscription group names.
+        return ['group1']
+
+    @staticmethod
+    def publish(payload, info):
+        """Called to notify the client."""
+
+        # Here `payload` contains the `payload` from the `broadcast()`
+        # invocation (see below). You can return `MySubscription.SKIP`
+        # if you wish to suppress the notification to a particular
+        # client. For example, this allows to avoid notifications for
+        # the actions made by this particular client.
+        print("publish : ", payload)
+        return Test(text='Something has happened!')
+
+class CardHasCreated(Subscription):
+    sender = String()
+    card = Field(CardNode)
+    
+    class Arguments:
+        group = String()
+
+    @staticmethod
+    def subscribe(self, info, group):
+        return [group]
+
+    @staticmethod
+    def publish(self, info):
+        return CardHasCreated(sender=self.sender, card=self.card)
+    
+    @classmethod
+    def announce(cls, group, sender, card):
+        cls.broadcast(
+            group=group,
+            payload={"sender": sender, "card": card},
+        )
+
+class RelaySubscription(ObjectType):
+    test = Test.Field()
+    card_has_created = CardHasCreated.Field()
+
+'''
 Mutations
 '''
 
-
-# CardEdge = CardNode._meta.connection.Edge
 class CardEdge(ObjectType):
     node = Field(CardNode)
     cursor = String()
 
+class MutationWithSubscription(relay.ClientIDMutation):
+    text = String()
+    @classmethod
+    def mutate(cls, root, info, input):
+        t="hello subs"
+        Test.broadcast()
+        return MutationWithSubscription(text=t)
 
 class NewCard(relay.ClientIDMutation):
     ok = Boolean()
@@ -58,6 +125,7 @@ class NewCard(relay.ClientIDMutation):
             card_edge = CardEdge(
                 cursor=offset_to_cursor(Card.objects.count()), node=card)
 
+            CardHasCreated.announce("group1", card.author, card)
             return NewCard(card_edge=card_edge, ok=True)
         except Exception as err:
             print("NewCard error : ", err)
@@ -86,7 +154,7 @@ class UpdateCard(relay.ClientIDMutation):
         try:
             card = Card.objects.get(pk=from_global_id(input.id)[1])
             for key in input:
-                if key is not "id":
+                if key != "id":
                     setattr(card, key, getattr(input, key))
             card.save()
             return UpdateCard(card=card, ok=True)
@@ -117,3 +185,4 @@ class RelayMutation(AbstractType):
     new_card = NewCard.Field()
     update_card = UpdateCard.Field()
     delete_card = DeleteCard.Field()
+    with_subscription = MutationWithSubscription.Field()

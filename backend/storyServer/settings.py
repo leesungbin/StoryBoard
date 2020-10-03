@@ -38,8 +38,11 @@ INSTALLED_APPS = [
     'postit',
     'graphene_django',
     'corsheaders',
+    'channels',
+    'channels_graphql_ws',
 ]
-# ASGI_APPLICATION = "storyServer.routing.application"
+ASGI_APPLICATION = "storyServer.routing.application"
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
